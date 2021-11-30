@@ -1,0 +1,15 @@
+[
+  {
+    "name": "Estado de Minas",
+    "domain": "em.com.br",
+    "selectors": {
+      "title": "h1",
+      "body": "#rs_read_this2 > div",
+      "date": "strong.txt-gray-base",
+      "removeFromBody": [
+        ".read-more-widget",
+        "figure"
+      ]
+    }
+  }
+]

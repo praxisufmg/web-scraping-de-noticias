@@ -1,0 +1,14 @@
+{
+  "name": "web-scraping-de-noticias",
+  "version": "0.1",
+  "description": "",
+  "main": "index.js",
+  "author": "Victor Castro <victorcastromg@gmail.com>",
+  "license": "",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "get-port": "^6.0.0",
+    "nightmare": "^3.0.2",
+    "open": "^8.4.0"
+  }
+}
