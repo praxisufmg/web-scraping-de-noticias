@@ -1,18 +1,19 @@
 const newsProviders = require('./newsProviders.json')
-const readline = require("readline")
 const Nightmare = require('nightmare')
+require('nightmare-load-filter')(Nightmare);
 const cheerio = require('cheerio')
-const open = require('open')
-const http = require("http")
+const csv = require('csv-parser')
+const fs = require('fs')
+const ObjectsToCsv = require('objects-to-csv');
 
 const nightmare = Nightmare({
-    pollInterval: 200 //in ms
+    // pollInterval: 200,
+    show: true,
+    openDevTools: { detach: true },
+    webPreferences: {
+        images: false
+    }
 })
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
 
 const print = message => {
     console.log(message)
@@ -29,36 +30,16 @@ const getData = (selectors, raw) => {
     selectors.removeFromBody.forEach(item => body.find(item).empty())
 
     const date = removeSpaces($(selectors.date).text())
-
-    const port = 3000
-
-    http.createServer(function (req, res) {
-        res.write('<html><head>');
-        res.write('<meta http-equiv="content-type" content="text/html; charset=utf-8" />');
-        res.write('<style> table, th, td {border: 1px solid black;border-collapse: collapse;}</style>');
-        res.write('</head><body>');
-        res.write('<table>');
-        res.write('<tr>');
-        res.write('<th>Título</th>');
-        res.write('<th>Data</th>');
-        res.write('<th>Corpo</th>');
-        res.write('</tr>');
-        res.write('<tr>');
-        res.write('<th>' + title + '</th>');
-        res.write('<th>' + date + '</th>');
-        res.write('<th>' + body.text() + '</th>');
-        res.write('</tr>');
-        res.write('</table>');
-        res.end('</body></html>');
-        process.exit(0)
+    output.push({
+        Titulo: title,
+        Data: date,
+        Corpo: body.text()
     })
-        .listen(port);
-
-    open('http://localhost:'+ port)
 }
 
-rl.question("Url: ", async url => {
-    const newsProvider = newsProviders.find(item => url.includes(item.domain))
+const loadWebsite = index => {
+    const line = lines[index]
+    const newsProvider = newsProviders.find(item => line.Url.includes(item.domain))
     if (newsProvider === undefined) {
         print('Jornal não identificado.')
         process.exit(1)
@@ -69,19 +50,61 @@ rl.question("Url: ", async url => {
 
     const selectors = newsProvider.selectors
 
-    nightmare
-        .viewport(1280, 800)
-        .goto(url)
+    return nightmare
+        .filter({
+            urls:[
+                'https://cdn.onesignal.com',
+
+            ]}, function(details, cb){
+                return cb({cancel: null});
+        })
+        .viewport(480, 320)
+        .goto(line.Url)
         .wait('body')
         .evaluate(() => document.querySelector('body').innerHTML)
-        .end()
+
+        // .end()
         .then(raw => {
             print('Processando...')
             getData(selectors, raw)
+            return true
         })
         .catch(error => {
             console.error('Ocorreu um erro: ', error)
             process.exit(1)
         })
-});
+}
+
+const output = []
+const saveOutput = () => {
+    const outputCsv = new ObjectsToCsv(output);
+
+    outputCsv.toDisk('./output.csv', undefined)
+        .then(() => process.exit(0))
+        .catch(() => {
+            print("Erro ao salvar arquivo")
+            process.exit(1)
+        });
+}
+
+const lines = [];
+let quantity = 0;
+
+const iterate = index => {
+    if(index < quantity) {
+        loadWebsite(index).then(() => iterate(index + 1))
+    }
+    else {
+        saveOutput()
+    }
+}
+
+fs.createReadStream('input.csv')
+    .pipe(csv())
+    .on('data', (data) => lines.push(data))
+    .on('end', () => {
+        quantity = lines.length
+        iterate(0)
+    });
+
 
