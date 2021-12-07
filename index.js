@@ -22,7 +22,9 @@ const removeSpaces = text => text.replace(/\s+/g, ' ').trim()
 const getData = (selectors, raw, url) => {
     const $ = cheerio.load(raw)
 
-    const title = removeSpaces($(selectors.title).text())
+    const title = selectors.title ? removeSpaces($(selectors.title).text()) : ''
+
+    const lead = selectors.lead ? removeSpaces($(selectors.lead).text()) : ''
 
     let body = $(selectors.body)
     selectors.removeFromBody.forEach(item => body.find(item).empty())
@@ -32,6 +34,8 @@ const getData = (selectors, raw, url) => {
     output.push({
         Link: url,
         Titulo: title,
+        Chamada: lead,
+        Corpo: body.text(),
         Data: date,
     })
 }

@@ -4,12 +4,47 @@
     "domain": "em.com.br",
     "selectors": {
       "title": "h1",
+      "lead": "#rs_read_this1 > p",
       "body": "#rs_read_this2 > div",
       "date": "strong.txt-gray-base",
       "removeFromBody": [
         ".read-more-widget",
         "figure"
       ]
+    }
+  },
+  {
+    "name": "O Tempo",
+    "domain": "otempo.com.br",
+    "selectors": {
+      "title": "h1",
+      "lead": ".chamada",
+      "body": ".texto-artigo",
+      "date": ".data-publicacao",
+      "removeFromBody": [
+        ".follow-gnews"
+      ]
+    }
+  },
+  {
+    "name": "Super Notícia - O Tempo",
+    "domain": "otempo.com.br/super-noticia",
+    "selectors": {
+      "title": "h1.titulo",
+      "lead": "h3.bigode",
+      "body": "span.texto-artigo",
+      "date": ".cell .data-publicacao",
+      "removeFromBody": []
+    }
+  },
+  {
+    "name": "Hoje em Dia",
+    "domain": "hojeemdia.com.br",
+    "selectors": {
+      "title": ".news-title",
+      "body": ".article-body",
+      "date": "div.time",
+      "removeFromBody": []
     }
   }
 ]
