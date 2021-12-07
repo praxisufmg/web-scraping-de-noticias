@@ -11,7 +11,7 @@
     "get-port": "^6.0.0",
     "nightmare": "^3.0.2",
     "nightmare-load-filter": "^0.2.0",
-    "objects-to-csv": "^1.3.6",
-    "open": "^8.4.0"
+    "open": "^8.4.0",
+    "xlsx": "^0.17.4"
   }
 }
